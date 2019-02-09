@@ -43,13 +43,31 @@ void client_tcp::executeSysCall(std::string command){
   }
   char output[4096];
   memset(&output[0], 0, 4096);
+  std::string overflowHelper;
+  int dataLength;
 
   if(send(this->sockfd, command.c_str(), command.length(), 0) != -1){
-    if(recv(this->sockfd, output, 4096, 0) == -1){
+    dataLength = recv(this->sockfd, output, 4096, 0);
+    if(dataLength > 0){
+      overflowHelper.append(output, dataLength);
+    }
+    if(dataLength > 4096){
+      dataLength -= 4096;
+      while(dataLength > 4096){
+        memset(&output[0], 0, 4096);
+        recv(this->sockfd, output, 4096, 0);
+        overflowHelper.append(output, dataLength);
+        dataLength -= 4096;
+      }
+      memset(&output[0], 0, 4096);
+      recv(this->sockfd, output, dataLength, 0);
+      overflowHelper.append(output, dataLength);
+    }
+    else if(dataLength == -1){
       perror("ERROR recieving message from server");
       exit(-1);
     }
-    std::cout<<output<<std::endl;
+    std::cout<<overflowHelper<<std::endl;
   }
   else{
     perror("ERROR sending command");

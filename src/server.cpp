@@ -62,7 +62,7 @@ void server_tcp::runSysCallServer(){
   }
   close(fd);
   close(this->sockfd);
-  std::cout<<"Server is no longer active"<<std::endl;
+  std::cout<<"Server is no longer accepting connections"<<std::endl;
 }
 void server_tcp::processCommands(int fd){
   std::string output;
@@ -135,7 +135,7 @@ void server_udp::runSysCallServer(){
   this->processCommands();
 
   close(this->sockfd);
-  std::cout<<"Server is no longer accepting connections"<<std::endl;
+  std::cout<<"Server is no longer active"<<std::endl;
 }
 void server_udp::processCommands(){
   struct sockaddr_storage client_addr;
